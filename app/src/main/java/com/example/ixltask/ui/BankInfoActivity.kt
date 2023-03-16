@@ -28,7 +28,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.ixltask.BuildConfig
 import com.example.ixltask.R
+import com.example.ixltask.SqliteHelper
+import com.example.ixltask.models.PersonalInfo
 import com.example.ixltask.ui.EmployeeInfoActivity.Companion.TAG
+import com.google.gson.Gson
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -63,10 +66,16 @@ class BankInfoActivity : AppCompatActivity() {
     private var cameraLauncher: ActivityResultLauncher<Intent>? = null
     private var myBitmap: Bitmap? = null
 
+    private var personalInfo: PersonalInfo? = null
+    private var userId: Int = -1
+    private lateinit var sqliteHelper: SqliteHelper
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bank_info)
+
+        sqliteHelper = SqliteHelper(this)
 
         bankInfoToolbar = findViewById(R.id.bankInfoToolbar)
         bankNameEt = findViewById(R.id.bankNameEt)
@@ -80,7 +89,6 @@ class BankInfoActivity : AppCompatActivity() {
         bankBranchesList = resources.getStringArray(R.array.backBranchArray).toList()
         multiple_permissions =
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES)
-
 
         var bankBranchAdapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_item, bankBranchesList)
@@ -98,19 +106,37 @@ class BankInfoActivity : AppCompatActivity() {
             }
         }
 
+        personalInfo = intent.getParcelableExtra<PersonalInfo>(PersonalInfoActivity.PARCELABLE_KEY)
+        userId = intent.getIntExtra(PersonalInfoActivity.USER_ID_KEY, -1)
+        Log.d(TAG, "onCreate: bank: personal info: ${personalInfo.toString()}")
+        if (userId != -1) {
+            bankNameEt.setText(personalInfo!!.bankInfo!!.bankName)
+            accountNoEt.setText(personalInfo!!.bankInfo!!.accountNo)
+            ifscCodeEt.setText(personalInfo!!.bankInfo!!.ifscCode)
+
+            bankBranchName = personalInfo!!.bankInfo!!.branchName
+            selectedBankBranchPosition = bankBranchesList.indexOf(bankBranchName)
+            bankBranchSpinner.setSelection(selectedBankBranchPosition)
+
+           /* myBitmap = sqliteHelper.getUserImage(userId)
+            myBitmap = BitmapFactory.decodeFile(captured_profile_path!!.absolutePath)
+            bankProfileIV.setImageBitmap(myBitmap)
+            bankProfileIV.setBackgroundResource(0)
+            bankProfileIButton.visibility = View.GONE*/
+        }
+
+
         bankProfileIV.setOnClickListener {
             Log.d(TAG, "onClick: cam");
             if (checkPermissions()) {
                 openCameraForPhoto();
             }
 
-//            getPermission()
         }
         bankProfileIButton.setOnClickListener(View.OnClickListener {
             if (checkPermissions()) {
                 openCameraForPhoto();
             }
-//            getPermission()
         })
 
         submitBankInfoButton.setOnClickListener {
@@ -118,9 +144,25 @@ class BankInfoActivity : AppCompatActivity() {
             if (!checkAllFields()) {
                 return@setOnClickListener
             } else {
-//                val intent = Intent(this, MainActivity::class.java)
-//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                startActivity(intent)
+                personalInfo!!.bankInfo!!.bankName = bankNameEt.text.toString().trim()
+                personalInfo!!.bankInfo!!.branchName = bankBranchName!!
+                personalInfo!!.bankInfo!!.accountNo = accountNoEt.text.toString().trim()
+                personalInfo!!.bankInfo!!.ifscCode = ifscCodeEt.text.toString().trim()
+
+                Log.d(TAG, "onCreate: bank: person info: ${personalInfo.toString()}")
+
+                val gson = Gson()
+                val jsonData = gson.toJson(personalInfo)
+                Log.d(TAG, "onCreate: bank: jsonData: $jsonData")
+
+                if (userId != -1) {
+                    sqliteHelper.updateUserData(jsonData, userId, myBitmap!!)
+                } else {
+                    sqliteHelper.addUserData(jsonData, myBitmap!!)
+                }
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
             }
         }
         cameraPermissionLauncher =
@@ -224,6 +266,10 @@ class BankInfoActivity : AppCompatActivity() {
             Toast.makeText(this, "please select valid bank branch", Toast.LENGTH_SHORT).show()
             return false
         }
+        /*if (myBitmap == null) {
+            Toast.makeText(this, "please capture your image", Toast.LENGTH_SHORT).show()
+            return false
+        }*/
 
 
         // after all validation return true.
@@ -246,8 +292,7 @@ class BankInfoActivity : AppCompatActivity() {
             .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, id ->
                 dialog.dismiss()
                 openSettings()
-            }).setNegativeButton(
-                "Cancel",
+            }).setNegativeButton("Cancel",
                 DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
         val alert: AlertDialog = builder.create()
         alert.show()

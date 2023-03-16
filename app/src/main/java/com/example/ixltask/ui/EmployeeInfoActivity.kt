@@ -8,8 +8,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import com.example.ixltask.R
-import com.example.ixltask.UtilsClass
-import com.example.ixltask.models.EmployeeInfo
 import com.example.ixltask.models.PersonalInfo
 
 class EmployeeInfoActivity : AppCompatActivity() {
@@ -34,12 +32,12 @@ class EmployeeInfoActivity : AppCompatActivity() {
 
     private lateinit var accountTypeList: List<String>
     private lateinit var totalExpList: List<String>
-    private lateinit var personalInfo: PersonalInfo
+    private var personalInfo: PersonalInfo? = null
+    private var userId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_employee_info)
-
 
 
         empInfoToolbar = findViewById(R.id.empInfoToolbar)
@@ -100,25 +98,47 @@ class EmployeeInfoActivity : AppCompatActivity() {
 
         }
 
+        personalInfo =
+            intent.getParcelableExtra<PersonalInfo>(PersonalInfoActivity.PARCELABLE_KEY)
+        userId = intent.getIntExtra(PersonalInfoActivity.USER_ID_KEY, -1)
+
+        if (userId != -1) {
+            empNoEt.setText(personalInfo!!.employeeInfo!!.empNo)
+            empNameEt.setText(personalInfo!!.employeeInfo!!.empName)
+            empDesignationEt.setText(personalInfo!!.employeeInfo!!.empDesignation)
+
+            accountType = personalInfo!!.employeeInfo!!.accountType
+            selectedAccountTypeId = accountTypeList.indexOf(accountType)
+            accountTypeSpinner.setSelection(selectedAccountTypeId)
+
+            totalWorkExp = personalInfo!!.employeeInfo!!.workExp
+            selectedTotalWorkExp = totalExpList.indexOf(totalWorkExp)
+            workExpSpinner.setSelection(selectedTotalWorkExp)
+        }
+
+        Log.d(TAG, "onCreate: emp: personal info: ${personalInfo.toString()}")
+
+
         submitEmpButton.setOnClickListener(View.OnClickListener {
-//
-//            if (UtilsClass.validateEditFields(
-//                    this, empNoEt, "please enter valid employee no"
-//                ) or !UtilsClass.validateEditFields(
-//                    this, empNameEt, "please enter valid employee name"
-//                ) or !UtilsClass.validateEditFields(
-//                    this, empDesignationEt, "please enter valid designation"
-//                ) or !UtilsClass.validateSpinnerData(
-//                    this, selectedAccountTypeId, "please select valid account type"
-//                ) or !UtilsClass.validateSpinnerData(
-//                    this, selectedTotalWorkExp, "please select your experience"
-//                )
-//            )
+
             if (!checkAllFields()) {
                 return@OnClickListener
             } else {
-                Log.d(TAG, "onCreate: emp: account type: ${accountType} :: exp: $totalWorkExp")
+                Log.d(
+                    TAG,
+                    "onCreate: emp: account type: ${selectedAccountTypeId} :: exp: $selectedTotalWorkExp"
+                )
+
+                personalInfo!!.employeeInfo!!.empNo = empNoEt.text.toString().trim()
+                personalInfo!!.employeeInfo!!.empName = empNameEt.text.toString().trim()
+                personalInfo!!.employeeInfo!!.empDesignation =
+                    empDesignationEt.text.toString().trim()
+                personalInfo!!.employeeInfo!!.accountType = accountType!!
+                personalInfo!!.employeeInfo!!.workExp = totalWorkExp!!
+
                 val intent = Intent(this, BankInfoActivity::class.java)
+                intent.putExtra(PersonalInfoActivity.PARCELABLE_KEY, personalInfo)
+                intent.putExtra(PersonalInfoActivity.USER_ID_KEY, userId)
                 startActivity(intent)
             }
         })

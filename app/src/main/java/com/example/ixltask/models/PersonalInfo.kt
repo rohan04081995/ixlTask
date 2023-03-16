@@ -6,7 +6,7 @@ import android.os.Parcelable
 data class PersonalInfo(
     var firstName: String="",
     var lastName: String="",
-    var phoneName: String="",
+    var phoneNo: String="",
     var gender: Int=0,
     var dob: String="",
     var employeeInfo: EmployeeInfo?=null,
@@ -26,7 +26,7 @@ data class PersonalInfo(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(firstName)
         parcel.writeString(lastName)
-        parcel.writeString(phoneName)
+        parcel.writeString(phoneNo)
         parcel.writeInt(gender)
         parcel.writeString(dob)
         parcel.writeParcelable(employeeInfo, flags)

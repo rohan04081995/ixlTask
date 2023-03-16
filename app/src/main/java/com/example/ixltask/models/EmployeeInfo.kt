@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class EmployeeInfo(
-    var employeeNo: String = "",
+    var empNo: String = "",
     var empName: String = "",
     var empDesignation: String = "",
     var accountType: String = "",
@@ -20,7 +20,7 @@ data class EmployeeInfo(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(employeeNo)
+        parcel.writeString(empNo)
         parcel.writeString(empName)
         parcel.writeString(empDesignation)
         parcel.writeString(accountType)

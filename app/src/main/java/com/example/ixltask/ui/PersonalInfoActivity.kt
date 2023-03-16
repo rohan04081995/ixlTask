@@ -8,14 +8,16 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.ixltask.R
-import com.example.ixltask.UtilsClass.Companion.validateEditFields
+import com.example.ixltask.models.BankInfo
+import com.example.ixltask.models.EmployeeInfo
 import com.example.ixltask.models.PersonalInfo
 import com.example.ixltask.ui.EmployeeInfoActivity.Companion.TAG
 
 class PersonalInfoActivity : AppCompatActivity() {
 
     companion object {
-        public val PARCELABLE_KEY = "parcelKey"
+        val PARCELABLE_KEY = "parcelKey"
+        val USER_ID_KEY = "userIdKeyX"
     }
 
     private lateinit var personalInfoToolbar: Toolbar
@@ -27,12 +29,17 @@ class PersonalInfoActivity : AppCompatActivity() {
     private lateinit var submitPInfoButton: Button
 
     var selectedRadioButtonId: RadioButton? = null
-    private lateinit var personalInfo: PersonalInfo
+    private var personalInfo: PersonalInfo? = null
+    private var radioId: Int = 0
+    /*0 for male 1 for female*/
+
+    private lateinit var maleRb: RadioButton
+    private lateinit var femaleRb: RadioButton
+    private var userid: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_personal_info)
-        personalInfo = intent.extras.getParcelable(PersonalInfoActivity.PARCELABLE_KEY,PersonalInfo::class.java)
 
         personalInfoToolbar = findViewById(R.id.personalInfoToolbar)
         firstNameEt = findViewById(R.id.firstNameEt)
@@ -41,6 +48,30 @@ class PersonalInfoActivity : AppCompatActivity() {
         radioGroup = findViewById(R.id.radioGroup)
         dobEt = findViewById(R.id.dobEt)
         submitPInfoButton = findViewById(R.id.submitPInfoButton)
+        maleRb = findViewById(R.id.maleRb)
+        femaleRb = findViewById(R.id.femaleRb)
+
+
+        personalInfo = intent.getParcelableExtra<PersonalInfo>(PersonalInfoActivity.PARCELABLE_KEY)
+        userid = intent.getIntExtra(PersonalInfoActivity.USER_ID_KEY, -1)
+
+        Log.d(TAG, "onCreate: personalinfo: ${personalInfo.toString()}")
+        if (userid == -1) {
+            personalInfo = PersonalInfo(employeeInfo = EmployeeInfo(), bankInfo = BankInfo())
+        } else {
+            firstNameEt.setText(personalInfo!!.firstName)
+            lastNameEt.setText(personalInfo!!.lastName)
+            phoneNoEt.setText(personalInfo!!.phoneNo)
+            radioId = personalInfo!!.gender
+            if (radioId == 0) {
+                maleRb.isChecked = true
+                selectedRadioButtonId = maleRb
+            } else {
+                femaleRb.isChecked = true
+                selectedRadioButtonId = femaleRb
+            }
+            dobEt.setText(personalInfo!!.dob)
+        }
 
 
         submitPInfoButton.setOnClickListener(View.OnClickListener {
@@ -50,47 +81,29 @@ class PersonalInfoActivity : AppCompatActivity() {
                 return@OnClickListener
             } else {
 
+                personalInfo!!.firstName = firstNameEt.text.toString().trim()
+                personalInfo!!.lastName = lastNameEt.text.toString().trim()
+                personalInfo!!.phoneNo = phoneNoEt.text.toString().trim()
+                personalInfo!!.gender = radioId
+                personalInfo!!.dob = dobEt.text.toString().trim()
+
                 val intent = Intent(this, EmployeeInfoActivity::class.java)
                 intent.putExtra(PARCELABLE_KEY, personalInfo)
+                intent.putExtra(USER_ID_KEY, userid)
+                intent.putExtra(USER_ID_KEY, userid)
                 startActivity(intent)
             }
         })
 
         radioGroup.setOnCheckedChangeListener { group, checkedId ->
             selectedRadioButtonId = findViewById(checkedId)
-            Toast.makeText(this, selectedRadioButtonId?.text, Toast.LENGTH_SHORT).show()
+            if (selectedRadioButtonId!!.id == R.id.maleRb) {
+                radioId = 0
+            } else {
+                radioId = 1
+            }
         }
     }
-
-    /* fun validateEditFields(editText: EditText, msg: String): Boolean {
-         if (editText.text.toString().trim().isEmpty()) {
-             editText.error = msg
-             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-             return false
-         } else {
-             editText.error = null
-             return false
-         }
-     }*/
-//
-//    fun validateRadioButtonSelection(): Boolean {
-//        if (selectedRadioButtonId == null) {
-//            Toast.makeText(this, "please select gender", Toast.LENGTH_SHORT).show()
-//            return false
-//        } else {
-//            return true
-//        }
-//    }
-//
-//    fun validatePhoneNo(): Boolean {
-//        if (phoneNoEt.text.toString().trim().length < 10) {
-//            phoneNoEt.error = "please enter valid phone no"
-//            Toast.makeText(this, "please enter valid phone no", Toast.LENGTH_SHORT).show()
-//            return false
-//        } else {
-//            return true
-//        }
-//    }
 
     private fun checkAllFields(): Boolean {
         if (firstNameEt.text.toString().trim().isEmpty()) {
