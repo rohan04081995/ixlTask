@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.BankInfoActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/bankInfoToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/design_default_color_primary"
+        android:theme="@style/Theme.AppCompat.Light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Bank Info"
+        app:titleTextColor="@color/white" />
+
+    <ImageView
+        android:id="@+id/bankProfileIV"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="@color/greyColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bankInfoToolbar" />
+
+    <ImageButton
+        android:id="@+id/bankProfileIButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/add_icon"
+        app:layout_constraintBottom_toBottomOf="@id/bankProfileIV"
+        app:layout_constraintEnd_toEndOf="@id/bankProfileIV"
+        app:layout_constraintStart_toStartOf="@id/bankProfileIV"
+        app:layout_constraintTop_toTopOf="@id/bankProfileIV" />
+
+    <EditText
+        android:id="@+id/bankNameEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="your Bank name"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bankProfileIV" />
+
+    <Spinner
+        android:id="@+id/bankBranchSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bankNameEt" />
+
+    <EditText
+        android:id="@+id/accountNoEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="your account name"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bankBranchSpinner" />
+
+    <EditText
+        android:id="@+id/ifscCodeEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="your ifsc name"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accountNoEt" />
+
+    <Button
+        android:id="@+id/submitBankInfoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Submit"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ifscCodeEt" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

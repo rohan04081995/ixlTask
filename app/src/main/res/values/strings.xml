@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">IXL Task</string>
+
+    <string-array name="accountTypeArray">
+        <item>select account type</item>
+        <item>Part time</item>
+        <item>Full time</item>
+        <item>Permanent</item>
+        <item>Contract</item>
+    </string-array>
+
+    <string-array name="totalExpArray">
+        <item>select experience in years</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="backBranchArray">
+        <item>select bank branch</item>
+        <item>Mumbai</item>
+        <item>Thane</item>
+        <item>Dadar</item>
+        <item>Andheri</item>
+    </string-array>
+
+</resources>
