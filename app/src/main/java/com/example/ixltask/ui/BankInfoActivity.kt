@@ -35,7 +35,6 @@ import com.google.gson.Gson
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 private const val MULTIPLE_REQUEST_CODE = 1
@@ -118,11 +117,13 @@ class BankInfoActivity : AppCompatActivity() {
             selectedBankBranchPosition = bankBranchesList.indexOf(bankBranchName)
             bankBranchSpinner.setSelection(selectedBankBranchPosition)
 
-           /* myBitmap = sqliteHelper.getUserImage(userId)
-            myBitmap = BitmapFactory.decodeFile(captured_profile_path!!.absolutePath)
-            bankProfileIV.setImageBitmap(myBitmap)
-            bankProfileIV.setBackgroundResource(0)
-            bankProfileIButton.visibility = View.GONE*/
+            myBitmap = sqliteHelper.getUserImage(userId)
+            if (myBitmap != null) {
+                myBitmap = BitmapFactory.decodeFile(captured_profile_path!!.absolutePath)
+                bankProfileIV.setImageBitmap(myBitmap)
+                bankProfileIV.setBackgroundResource(0)
+                bankProfileIButton.visibility = View.GONE
+            }
         }
 
 
@@ -205,6 +206,9 @@ class BankInfoActivity : AppCompatActivity() {
                 if (captured_profile_path!!.exists()) {
 //                    getImageFromCameraUri(profilePhotoURI)
                     myBitmap = BitmapFactory.decodeFile(captured_profile_path!!.absolutePath)
+
+                    myBitmap = getResizedBitmap(myBitmap!!, 480)
+
                     bankProfileIV.setImageBitmap(myBitmap)
                     bankProfileIV.setBackgroundResource(0)
                     bankProfileIButton.visibility = View.GONE
@@ -213,6 +217,19 @@ class BankInfoActivity : AppCompatActivity() {
         }
     }
 
+    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap? {
+        var width = image.width
+        var height = image.height
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 1) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height * bitmapRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
 
     @SuppressLint("QueryPermissionsNeeded")
     fun openCameraForPhoto() {
@@ -266,10 +283,10 @@ class BankInfoActivity : AppCompatActivity() {
             Toast.makeText(this, "please select valid bank branch", Toast.LENGTH_SHORT).show()
             return false
         }
-        /*if (myBitmap == null) {
+        if (myBitmap == null) {
             Toast.makeText(this, "please capture your image", Toast.LENGTH_SHORT).show()
             return false
-        }*/
+        }
 
 
         // after all validation return true.
